@@ -20,6 +20,8 @@ def gerar_link():
         'x-idempotency-key': '<SOME_UNIQUE_VALUE>'
     }
 
+    base_url = os.getenv("BASE_URL", "http://127.0.0.1:5000").rstrip("/")
+
     payment_data = {
         "items": [
             {
@@ -32,13 +34,19 @@ def gerar_link():
             }
         ],
         "back_urls": {
-            "success": "http://127.0.0.1:5000/success",
-            "failure": "http://127.0.0.1:5000/failure",
-            "pending": "http://127.0.0.1:5000/failure"
+            "success": f"{base_url}/success",
+            "failure": f"{base_url}/failure",
+            "pending": f"{base_url}/failure"
         },
-        "auto_return": "all"
     }
+
+    # A API do Mercado Pago rejeita auto_return quando as back_urls usam HTTP/localhost
+    if base_url.startswith("https://"):
+        payment_data["auto_return"] = "all"
+
     result = sdk.preference().create(payment_data, request_options)
-    payment = result["response"]
-    print(payment)
+    payment = result.get("response", {})
+    if result.get("status", 0) >= 400 or "init_point" not in payment:
+        raise RuntimeError(f"Erro ao criar preferência no Mercado Pago: {payment}")
+
     return payment["init_point"]

@@ -41,9 +41,10 @@ Protótipo em Flask para geração de links de pagamento (Checkout Pro) e tratam
    ```bash
    cp .env.example .env
    ```
-   Edite o `.env` e informe sua credencial:
+   Edite o `.env` e informe sua credencial (e, opcionalmente, `BASE_URL` caso utilize um túnel HTTPS como ngrok para habilitar `auto_return`):
    ```env
    MERCADO_PAGO_ACCESS_TOKEN=seu_access_token_aqui
+   # BASE_URL=https://seu-dominio.ngrok-free.app
    ```
 
 ## Como Executar
